@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <title>Bericht bearbeiten</title>
+    <style>
+        .col-md-12 {
+            height: 120px;
+            margin: 0 auto;
+            background-color: #0052C2;
+        }
+        #wekaBlack {
+            position: relative;
+            width: 180px;
+            height: 120px;
+            right: 12px;
+        }
+        h1 {
+            position: relative;
+            font-weight: bold;
+            color: white;
+            top: -20px;
+        }
+        .col-md-3 {
+            position: relative;
+            display: flex;
+            padding: 5px;
+            margin: auto;
+            font-size: 18px;
+            font-weight: bold;
+            justify-content: center;
+            align-items: center;
+        }
+        .report-form {
+            background-color: #F5F5F5;
+            padding: 10px;
+            border: 4px solid #0052C2;
+            font-size: 18px;
+            width: 880px;
+            padding: 2px;
+            color: black;
+        }
+        .form-control:focus {
+            outline: none;
+            box-shadow: 0 0 0 0.2rem #66FF00;
+        }
+        .button-group {
+            display: grid;
+            padding: 5px;
+            margin-left: 0px;
+            margin-top: 0px;
+            grid-template-columns: repeat(1, 1fr); /* Erstellt 2 gleich breite Spalten */
+            gap: 10px; /* Optional: Fügt einen Abstand zwischen den Buttons hinzu */
+            justify-content: center; /* Zentriert die Buttons horizontal */
+        }
+        .btn-primary {
+            border: none;
+            border-radius: 5px;
+        }
+        #delButton {
+            display: flex;
+            position: relative;
+            left: 702px;
+            top: -50px;
+        }
+        .form-control-group {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        .form-control-group > div {
+            flex: 1;
+        }
+
+        #zoomLabel {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .form-range {
+            width: 20%;
+            display: flex;
+            position: relative;
+        }
+        .btn-success {
+            color: black;
+            background-color: white;
+            border: 2px solid #66FF00;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .btn-success:hover {
+            transition-duration: 0.8s;
+            background-color: #99CC00;
+        }
+        .form-range::-webkit-slider-thumb {
+            background-color: black;
+            border: 1px solid #66FF00;
+        }
+        .form-range::-webkit-slider-thumb:hover {
+            transition-duration: 0.8s;
+            background-color: #99CC00;
+        }
+    </style>
+    <script>
+        const body = document.getElementsByTagName("body")[0];
+        var reportForm = document.getElementById("reportForm");
+        // Beim Laden der Seite den Zustand aus dem localStorage wiederherstellen
+            if (localStorage.getItem("darkMode") === "true") {
+                body.style.backgroundColor = "black";
+                reportForm.style.backgroundColor = "#A9A9A9";
+            } else {
+                body.style.backgroundColor = "white";
+                reportForm.style.backgroundColor = "#F5F5F5";
+            }
+        });
+
+        window.addEventListener("resize", function() {
+        var box = document.getElementById("box");
+        const windowWidth = window.innerWidth;
+            if (windowWidth < 1000) {
+                box.style.left = "210px";
+            } else {
+                box.style.left = "";
+            }
+        });
+
+        function zoomPage(zoomValue) {
+            var zoom = zoomValue / 100;
+            document.body.style.transform = "scale(" + zoom + ")";
+            document.body.style.transformOrigin = "0 0";
+            // Den eingestellten Zoom-Level im localStorage speichern
+            localStorage.setItem("zoom", zoomValue);
+        }
+        function resetZoom() {
+            document.getElementById("zoom").value = 100;
+            zoomPage(100);
+        }
+    </script>
+</head>
+<body>
+<div class="container-fluid d-flex flex-column">
+    <div class="row">
+        <div class="col-md-12 d-flex align-items-center">
+            <img id="wekaBlack" src="/WekaLogoBlack.png" alt="weka">
+            <h1>Bericht bearbeiten</h1>
+        </div>
+    </div>
+    <main class="flex-grow-1">
+        <div class="row">
+            <div class="col-md-3" id="box">
+                <section class="report-form" id="reportForm">
+                    <div th:each="bericht : ${berichte}">
+                        <form action="/bearbeiten/speichern" method="POST">
+                            <div class="form-control-group">
+                                <div>
+                                    <label for="id">ID:</label>
+                                    <input type="number" id="id" name="id" placeholder="Vergebe eine ID..." required th:value="${bericht.id}" class="form-control"><br>
+
+                                    <label for="status">Status:</label>
+                                    <select id="status" name="status" required class="form-control">
+                                        <option value="" selected disabled>Bitte auswählen</option>
+                                        <option th:each="statusOption : ${allStatusOptions}" th:value="${statusOption}" th:text="${statusOption}" th:selected="${statusOption.equals(bericht.status)}"></option>
+                                    </select><br>
+
+                                    <label for="datum_start">Start Datum:</label>
+                                    <input type="date" id="datum_start" name="datum_start" required th:value="${bericht.datum_start}" class="form-control"><br>
+
+                                    <label for="datum_ende">End Datum:</label>
+                                    <input type="date" id="datum_ende" name="datum_ende" required th:value="${bericht.datum_ende}" class="form-control"><br>
+
+                                    <label for="zeit_start">Startzeit:</label>
+                                    <input type="time" id="zeit_start" name="zeit_start" required th:value="${bericht.zeit_start}" class="form-control"><br>
+
+                                    <label for="zeit_ende">Endzeit:</label>
+                                    <input type="time" id="zeit_ende" name="zeit_ende" required th:value="${bericht.zeit_ende}" class="form-control"><br>
+                                </div>
+                                <div>
+                                    <label id="inhaltLabel" for="inhalt">Inhalt:</label>
+                                    <textarea id="inhalt" name="inhalt" rows="10" maxlength="650" placeholder="Schreibe hier deinen Berichtsinhalt..." wrap="soft" style="width: 80ch;" required th:text="${bericht.inhalt}" class="form-control"></textarea><br>
+
+                                    <label id="notizLabel" for="notiz">Notiz:</label>
+                                    <textarea id="notiz" name="notiz" rows="10" maxlength="650" placeholder="Schreibe hier deine Berichtsnotizen..." wrap="soft" style="width: 80ch;" required th:text="${bericht.notiz}" class="form-control"></textarea><br>
+                                </div>
+                            </div>
+                            <div class="button-group">
+                                <button id="backButton" class="btn-primary">Zurück</button>
+                            </div>
+                        </form>
+                        <div class="button-group">
+                            <form action="/bearbeiten/pdf" method="POST">
+                                <input type="hidden" name="datum_start" th:value="${bericht.datum_start}">
+                                <button type="submit" class="btn btn-info">PDF erstellen</button>
+                            </form>
+                            <form action="/bearbeiten/loeschen" method="GET">
+                                <input type="hidden" name="datum_start" th:value="${bericht.datum_start}">
+                                <input type="hidden" name="zeit_start" th:value="${bericht.zeit_start}">
+                                <button id="delButton" type="submit" class="btn btn-danger">Bericht löschen</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+    <div class="row">
+        <div class="col-md-12">
+            <label id="zoomLabel" for="zoom">Zoom:</label>
+            <input type="range" class="form-range" id="zoom" name="zoom" min="50" max="200" value="100" onchange="zoomPage(this.value)">
+            <button onclick="resetZoom()" class="btn btn-success">Zurücksetzen</button>
+        </div>
+    </div>
+</div>
+<footer>
+
+</footer>
+<script>
+
+    document.getElementById('inhalt').addEventListener('input', function() {
+        var lines = this.value.split('\n');
+        // Überprüfen, ob die Anzahl der Zeilen größer als 10 ist
+        if (lines.length > 10) {
+            // Wenn ja, begrenzen Sie die Anzahl der Zeilen auf 10
+            this.value = lines.slice(0, 10).join('\n');
+            alert('Sie können nicht mehr als 10 Zeilen eingeben.');
+        }
+    });
+    document.getElementById('notiz').addEventListener('input', function() {
+        var lines = this.value.split('\n');
+        // Überprüfen, ob die Anzahl der Zeilen größer als 10 ist
+        if (lines.length > 10) {
+            // Wenn ja, begrenzen Sie die Anzahl der Zeilen auf 10
+            this.value = lines.slice(0, 10).join('\n');
+            alert('Sie können nicht mehr als 10 Zeilen eingeben.');
+        }
+    });
+
+    var backbutton = document.getElementById("backButton");
+        if (backButton) {
+            backButton.addEventListener("click", function() {
+            window.location.href = "/";
+        });
+    }
+    var savedZoom = localStorage.getItem("zoom");
+        if (savedZoom) {
+            document.getElementById("zoom").value = savedZoom;
+            zoomPage(savedZoom);
+        }
+</script>
+</body>
+</html>

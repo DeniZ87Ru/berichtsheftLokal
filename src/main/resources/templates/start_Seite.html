@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="de" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" crossorigin="anonymous" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <title>Mein Berichtsheft</title>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/locales/de.js'></script>
+    <style>
+        .col-md-12 {
+            height: 120px;
+            margin: 0 auto;
+            background-color: #0052C2;
+        }
+
+        body {
+            background-color: white;
+        }
+
+        #wekaBlack {
+            position: relative;
+            width: 180px;
+            height: 120px;
+            right: 12px;
+        }
+
+        #mttd {
+            width: 150px;
+            height: 100px;
+            border-radius: 5px;
+            box-shadow: 10px 5px 10px rgba(0, 0, 0, 0.8);
+            position: relative;
+            display: flex;
+            margin: 0 auto;
+            border: 2px solid #66FF00;
+        }
+        #mttd:hover {
+            box-shadow: 1px 1px 1px rgba(1, 0, 0, 0.8);
+        }
+
+        h1 {
+            position: relative;
+            font-weight: bold;
+            color: white;
+            top: -35px;
+        }
+
+        .suchID, .suchDatum {
+            display: block;
+            position: relative;
+            font-size: 5px;
+            font-weight: bold;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+            right: 163px;
+            top: -5px;
+        }
+        .form-control {
+            height: 25px;
+            width: 125px;
+            margin-top: 45px;
+        }
+        .form-control:focus {
+            outline: none;
+            box-shadow: 0 0 0 0.2rem #66FF00;
+        }
+        #sucheIdButton, #sucheDatumButton {
+            background-color: white;
+            position: relative;
+            display: block;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+            color: black;
+            font-size: 18px;
+            font-weight: bold;
+            width: 125px;
+            border: 2px solid #66FF00;
+            border-radius: 5px;
+        }
+        #sucheIdButton:hover, #sucheDatumButton:hover {
+            transition-duration: 0.8s;
+            background-color: #99CC00;
+        }
+
+        .toggle-switch {
+            position: absolute;
+            display: block;
+            margin: 0 auto;
+            width: 60px;
+            height: 34px;
+            right: 0;
+            margin-top: 5px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        #darkModeLabel {
+            margin-left: -120px;
+            margin-top: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: black;
+            transition: .4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border: 2px solid #66FF00;
+        }
+        input:checked + .slider {
+            background-color: white;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+            background-color: black;
+            height: 26px;
+            width: 26px;
+        }
+        .slider.round {
+            border-radius: 34px;
+        }
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        .col-md-3 {
+            margin: auto;
+            padding: 20px 20px 20px;
+            width: 400px;
+            height: 690px;
+        }
+
+        .sidebar {
+            position: relative;
+            display: block;
+            padding: 5px 5px 5px;
+            width: 385px;
+            height: 650px;
+            background-color: #F5F5F5;
+            color: black;
+            font-size: 18px;
+            font-weight: bold;
+            border: 4px solid #0052C2;
+            overflow: auto;
+            box-shadow: 5px 0px 5px rgba(0, 0, 0, 1);
+        }
+        h2 {
+            font-size: 26px;
+            font-weight: bold;
+            padding: 5px;
+        }
+        #selectedDateInfo{
+            position: relative;
+            display: block;
+            margin: auto;
+            padding: 50px 5px 5px;
+        }
+        #overrideButton {
+            position: relative;
+            display: block;
+            margin: auto;
+            background-color: white;
+            color: black;
+            font-size: 16px;
+            font-weight: bold;
+            border: 2px solid #66FF00;
+            border-radius: 5px;
+            box-shadow: 1px 5px 4px rgba(0, 0, 0, 0.8);
+        }
+        #overrideButton:hover {
+            transition-duration: 0.8s;
+            background-color: #99CC00;
+            box-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8)
+        }
+
+        .col-md-9 {
+            position: relative;
+            display: flex;
+            margin: auto;
+        }
+
+        #calendar {
+            position: relative;
+            display: flex;
+            padding: 5px;
+            width: 1000px;
+            height: 680px;
+            margin: auto;
+            border: 4px solid #0052C2;
+            background-color: #F5F5F5;
+            box-shadow: 5px 0px 5px rgba(0, 0, 0, 1);
+        }
+        .fc-button-primary {
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+            width: 150px !important;
+            height: 25px !important;
+            margin-top: 5px !important;
+            border: 2px solid #66FF00 !important;
+            color: black !important;
+            background-color: white !important;
+            font-weight: bold !important;
+            box-shadow: 1px 5px 4px rgba(0, 0, 0, 0.8)!important;
+        }
+        .fc-button-primary:hover {
+            transition-duration: 0.8s !important;
+            background-color: #99CC00 !important;
+            box-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8)!important;
+        }
+        .fc .fc-daygrid-day-frame {
+            position: relative;
+            display: block;
+            margin: auto;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #zoomLabel {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .form-range {
+            width: 20%;
+            display: flex;
+            position: relative;
+        }
+        .btn-success {
+            color: black;
+            background-color: white;
+            border: 2px solid #66FF00;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .btn-success:hover {
+            transition-duration: 0.8s;
+            background-color: #99CC00;
+        }
+        .form-range::-webkit-slider-thumb {
+            background-color: black;
+            border: 1px solid #66FF00;
+        }
+        .form-range::-webkit-slider-thumb:hover {
+            transition-duration: 0.8s;
+            background-color: #99CC00;
+        }
+
+        .selected {
+            background-color: #FFFFE0;
+        }
+        .event-hover:hover {
+            background-color: #FFFFE0;
+        }
+        .fc-list-event-title:hover {
+            background-color: #FFFFE0 !important;
+        }
+        .fc-daygrid-day-number {
+            color: black;
+        }
+        .fc-col-header-cell-cushion {
+            color: black;
+        }
+    </style>
+    <script>
+        window.addEventListener("resize", function() {
+            var mttd = document.getElementById("mttd");
+            const windowWidth = window.innerWidth;
+                if (windowWidth < 1000) {
+                    mttd.style.width = "100px";
+                    mttd.style.height = "50px";
+                    mttd.style.top = "-20px";
+                    mttd.style.right = "130px";
+                } else {
+                    mttd.style.width = "";
+                    mttd.style.height = "";
+                    mttd.style.top = "";
+                    mttd.style.right = "";
+                }
+        });
+
+        window.addEventListener("resize", function() {
+            var box = document.getElementById("box");
+            var lines = document.getElementById("lines");
+            const windowWidth = window.innerWidth;
+                if (windowWidth < 1000) {
+                    box.style.left = "210px";
+                    lines.style.width = "600px";
+                } else {
+                    box.style.left = "";
+                    lines.style.width = "";
+                }
+        });
+
+        function zoomPage(zoomValue) {
+            var zoom = zoomValue / 100;
+            document.body.style.transform = "scale(" + zoom + ")";
+            document.body.style.transformOrigin = "0 0";
+            // Den eingestellten Zoom-Level im localStorage speichern
+            localStorage.setItem("zoom", zoomValue);
+        }
+        function resetZoom() {
+            document.getElementById("zoom").value = 100;
+            zoomPage(100);
+        }
+
+        // Beim Laden der Seite den Zoom-Level aus dem localStorage wiederherstellen
+        var savedZoom = localStorage.getItem("zoom");
+            if (savedZoom) {
+                document.getElementById("zoom").value = savedZoom;
+                zoomPage(savedZoom);
+            }
+
+        var backbutton = document.getElementById("backButton");
+            if (backButton) {
+                backButton.addEventListener("click", function() {
+                window.location.href = "/";
+            });
+        }
+    </script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 d-flex align-items-center" id="lines">
+            <img id="wekaBlack" src="WekaLogoBlack.png" alt="weka">
+            <h1>Berichtsheft</h1>
+            <div class="suchID">
+                <input type="number" placeholder="Suche ID.." id="identNummer" name="identNummer" class="form-control"><br>
+                <button id="sucheIdButton">Suchen</button>
+            </div>
+            <div class="suchDatum">
+                <input type="date" id="startDatum" name="startDatum" class="form-control"><br>
+                <button id="sucheDatumButton">Suchen</button>
+            </div>
+            <a href="https://to-do.microsoft.com/tasks/" target="_blank">
+                <img id="mttd" src="MTTD.png" alt="mttd" style="cursor:pointer;">
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3" id="sidebarContainer">
+            <div class="sidebar" id="sidebar">
+                <button id="overrideButton">Bearbeite
+                <h2>Eintrag</h2>
+                </button>
+                <div id="selectedDateInfo">
+                    <p><strong>ID:</strong> <span id="idInfo"></span></p>
+                    <p><strong>Status:</strong> <span id="statusInfo"></span></p>
+                    <p><strong>Startdatum:</strong> <span id="datum_startInfo"></span></p>
+                    <p><strong>Enddatum:</strong> <span id="datum_endeInfo"></span></p>
+                    <p><strong>Startzeit:</strong> <span id="zeit_startInfo"></span></p>
+                    <p><strong>Endzeit:</strong> <span id="zeit_endeInfo"></span></p>
+                    <br><br>
+                    <p><strong>Bericht:</strong> <span id="inhaltInfo"></span></p>
+                    <p><strong>Notizen:</strong> <span id="notizInfo"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div id="calendar"></div>
+            <div id="selectedDates"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <label class="toggle-switch">
+                <label id="darkModeLabel">DARK-MODE</label>
+                <input type="checkbox" id="toggle-switch">
+                <span class="slider round"></span>
+            </label>
+            <label id="zoomLabel" for="zoom">Zoom:</label>
+            <input type="range" class="form-range" id="zoom" name="zoom" min="50" max="200" value="100" onchange="zoomPage(this.value)">
+            <button onclick="resetZoom()" class="btn btn-success">Zurücksetzen</button>
+        </div>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script>
+    const schalter = document.getElementById("toggle-switch");
+            const body = document.getElementsByTagName("body")[0];
+            var kalender = document.getElementById("calendar");
+            var sidebar = document.getElementById("sidebar");
+
+            // Beim Laden der Seite den Zustand aus dem localStorage wiederherstellen
+            if (localStorage.getItem("darkMode") === "true") {
+                schalter.checked = true;
+                body.style.backgroundColor = "black";
+                kalender.style.backgroundColor = "#A9A9A9";
+                kalender.style.boxShadow = "5px 0px 5px rgba(255, 255, 255, 1)";
+                sidebar.style.backgroundColor = "#A9A9A9";
+                sidebar.style.boxShadow = "5px 5px 4px rgba(255, 255, 255, 1)";
+            }
+
+            function darkMoOde() {
+                if (schalter.checked) {
+                    body.style.backgroundColor = "black";
+                    kalender.style.backgroundColor = "#A9A9A9";
+                    kalender.style.boxShadow = "5px 0px 5px rgba(255, 255, 255, 1)";
+                    sidebar.style.backgroundColor = "#A9A9A9";
+                    sidebar.style.boxShadow = "5px 0px 5px rgba(255, 255, 255, 1)";
+                    localStorage.setItem("darkMode", "true");
+                } else {
+                    body.style.backgroundColor = "white";
+                    kalender.style.backgroundColor = "#F5F5F5";
+                    kalender.style.boxShadow = "5px 0px 5px rgba(0, 0, 0, 1)";
+                    sidebar.style.backgroundColor = "#F5F5F5";
+                    sidebar.style.boxShadow = "5px 0px 5px rgba(0, 0, 0, 1)";
+                    localStorage.setItem("darkMode", "false");
+                }
+            }
+            schalter.addEventListener("change", darkMoOde);
+
+    document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var selectedDates = [];
+    var lastClickTime = 0; // Zeit des letzten Klicks
+    var doubleClickDelay = 300; // Millisekunden (Zeit zwischen Klicks für Doppelklick)
+    var sidebar = document.querySelector('.sidebar');
+    var berichtErstellen = document.querySelector('.berichtErstellen');
+    var wekaHead = document.querySelector('.wekaHead');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+          timeZone: 'Europe/Berlin',
+          locale: 'de',
+          selectable: false,
+          nowIndicator: true,
+          events: {
+              url: '/events',
+              timeFormat: 'HH:mm',
+              dateFormat: 'yyyy-MM-dd',
+              method: 'GET'
+          },
+
+        headerToolbar: {
+            center: 'title',
+            right: 'next',
+            left: 'prev'
+        },
+        footerToolbar: {
+            center: 'today,dayGridMonth,listDay,listWeek,listMonth',
+        },
+        buttonText: {
+            today: 'Heute', // Text des "Heute"-Buttons ändern
+            dayGridMonth: 'Übersicht' // zurück zur Monatsansicht
+        },
+
+        views: {
+
+              dayGridMonth: {
+                // Konfiguration für die Monatsansicht
+                eventMouseEnter: function(info) {
+                    // Führen Sie hier den Hover-Effekt für das Ereignis aus
+                    info.el.classList.add("event-hover");
+                },
+                eventMouseLeave: function(info) {
+                    // Entfernen Sie den Hover-Effekt, wenn die Maus das Ereignis verlässt
+                    info.el.classList.remove("event-hover");
+                }
+              },
+
+              listDay: {
+                buttonText: 'Tagesliste',
+
+                // Konfiguration für die Tagesliste
+                eventMouseEnter: function(info) {
+                    // Führen Sie hier den Hover-Effekt für das Ereignis aus
+                    info.el.classList.add("event-hover");
+                },
+                eventMouseLeave: function(info) {
+                    // Entfernen Sie den Hover-Effekt, wenn die Maus das Ereignis verlässt
+                    info.el.classList.remove("event-hover");
+                }
+              },
+
+              listWeek: {
+                buttonText: 'Wochenliste',
+
+                // Konfiguration für die Wochenliste
+                eventMouseEnter: function(info) {
+                    // Führen Sie hier den Hover-Effekt für das Ereignis aus
+                    info.el.classList.add("event-hover");
+                },
+                eventMouseLeave: function(info) {
+                    // Entfernen Sie den Hover-Effekt, wenn die Maus das Ereignis verlässt
+                    info.el.classList.remove("event-hover");
+                }
+              },
+
+              listMonth: {
+                buttonText: 'Monatsliste',
+
+                // Konfiguration für die Wochenliste
+                eventMouseEnter: function(info) {
+                    // Führen Sie hier den Hover-Effekt für das Ereignis aus
+                    info.el.classList.add("views-hover");
+                },
+                eventMouseLeave: function(info) {
+                    // Entfernen Sie den Hover-Effekt, wenn die Maus das Ereignis verlässt
+                    info.el.classList.remove("views-hover");
+                }
+              },
+        },
+
+        eventClick: function(info) {
+            selectedEvent = info.event;
+            info.el.classList.add("selected");
+
+            // Einzelklick, führen Sie hier Ihre Einzelklick-Logik aus
+            var dateStart = info.event.start.toISOString().split('T')[0];
+
+            // Hier sollten die Event-Daten abgerufen werden
+            fetch('/getInformationForDate?datum_start=' + dateStart)
+            .then(response => response.json())
+            .then(data => {
+                // Leeren Sie die Sidebar
+                document.getElementById('selectedDateInfo').innerHTML = '';
+
+                // Durchlaufen Sie die Liste der Berichte
+                for (var i = 0; i < data.length; i++) {
+                    var bericht = data[i];
+
+                    // Extrahieren Sie die Informationen aus dem Bericht
+                    var id = bericht.id;
+                    var status = bericht.status;
+                    var datum_start = bericht.datum_start;
+                    var datum_ende = bericht.datum_ende;
+                    var zeit_start = bericht.zeit_start;
+                    var zeit_ende = bericht.zeit_ende;
+                    var inhalt = bericht.inhalt;
+                    var notiz = bericht.notiz;
+
+                    var dateStart = datum_start;
+                    var zeitStart = zeit_start;
+                    addEventListeners(dateStart, zeitStart);
+
+                    // Erstellen Sie ein neues Element für diesen Bericht
+                    var berichtElement = document.createElement('div');
+                    berichtElement.innerHTML =
+                    '<p><strong>ID:</strong> ' + id + '</p>' +
+                    '<p><strong>Status:</strong> ' + status + '</p>' +
+                    '<p><strong>Startdatum:</strong> ' + datum_start + '</p>' +
+                    '<p><strong>Enddatum:</strong> ' + datum_ende + '</p>' +
+                    '<p><strong>Startzeit:</strong> ' + zeit_start + '</p>' +
+                    '<p><strong>Endzeit:</strong> ' + zeit_ende + '</p>' +
+                    '<p><strong>Bericht:</strong> ' + inhalt + '</p>' +
+                    '<p><strong>Notizen:</strong> ' + notiz + '</p>';
+
+                    // Fügen Sie das Element zur Sidebar hinzu
+                    document.getElementById('selectedDateInfo').appendChild(berichtElement);
+                }
+            });
+        },
+
+        dateClick: function(info) {
+            var dateStart = info.start;
+            var dateEnd = info.end;
+
+            var currentTime = new Date().getTime();
+            if (currentTime - lastClickTime <= doubleClickDelay) {
+                // Doppelklick erkannt, tue hier etwas
+                var dateStart = info.date.toISOString().split('T')[0];
+                var localTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                window.location.href = '/erstellen?datum_start=' + dateStart + '&zeit_start=' + localTime;
+            }
+            // Aktualisiere die Zeit des letzten Klicks
+            lastClickTime = currentTime;
+
+            var dateStart = info.date.toISOString().split('T')[0];
+
+            // Hier sollten die Event-Daten abgerufen werden
+            fetch('/getInformationForDate?datum_start=' + dateStart)
+          .then(response => response.json())
+          .then(data => {
+            // Leeren Sie die Sidebar
+            document.getElementById('selectedDateInfo').innerHTML = '';
+
+            // Durchlaufen Sie die Liste der Berichte
+            for (var i = 0; i < data.length; i++) {
+                var bericht = data[i];
+
+                var id = bericht.id;
+                var status = bericht.status;
+                var datum_start = bericht.datum_start;
+                var datum_ende = bericht.datum_ende;
+                var zeit_start = bericht.zeit_start;
+                var zeit_ende = bericht.zeit_ende;
+                var inhalt = bericht.inhalt;
+                var notiz = bericht.notiz;
+
+                var dateStart = datum_start;
+                var zeitStart = zeit_start;
+
+                addEventListeners(dateStart, zeitStart);
+
+                // Erstellen Sie ein neues Element für diesen Bericht
+                var berichtElement = document.createElement('div');
+                berichtElement.innerHTML =
+                    '<p><strong>ID:</strong> ' + id + '</p>' +
+                    '<p><strong>Status:</strong> ' + status + '</p>' +
+                    '<p><strong>Startdatum:</strong> ' + datum_start + '</p>' +
+                    '<p><strong>Enddatum:</strong> ' + datum_ende + '</p>' +
+                    '<p><strong>Startzeit:</strong> ' + zeit_start + '</p>' +
+                    '<p><strong>Endzeit:</strong> ' + zeit_ende + '</p>' +
+                    '<p><strong>Bericht:</strong> ' + inhalt + '</p>' +
+                    '<p><strong>Notizen:</strong> ' + notiz + '</p>';
+
+                // Fügen Sie das Element zur Sidebar hinzu
+                document.getElementById('selectedDateInfo').appendChild(berichtElement);
+            }
+          });
+        }
+    });
+    calendar.render();
+
+                var sucheIdButton = document.getElementById('sucheIdButton');
+              sucheIdButton.addEventListener('click', function() {
+                var sidebar = document.querySelector('.sidebar');
+                var idInfo = document.getElementById('identNummer').value;
+
+                fetch('/sucheBerichtById?id=' + idInfo)
+                .then(response => response.json())
+                .then(data => {
+                    // Leeren Sie die Sidebar
+                    document.getElementById('selectedDateInfo').innerHTML = '';
+
+                    // Durchlaufen Sie die Liste der Berichte
+                    for (var i = 0; i < data.length; i++) {
+                        var bericht = data[i];
+
+                        var id = bericht.id;
+                        var status = bericht.status;
+                        var datum_start = bericht.datum_start;
+                        var datum_ende = bericht.datum_ende;
+                        var zeit_start = bericht.zeit_start;
+                        var zeit_ende = bericht.zeit_ende;
+                        var inhalt = bericht.inhalt;
+                        var notiz = bericht.notiz;
+
+                        var dateStart = datum_start;
+                        var zeitStart = zeit_start;
+
+                        addEventListeners(dateStart, zeitStart);
+
+                        // Erstellen Sie ein neues Element für diesen Bericht
+                        var berichtElement = document.createElement('div');
+                        berichtElement.innerHTML =
+                        '<p><strong>ID:</strong> ' + id + '</p>' +
+                        '<p><strong>Status:</strong> ' + status + '</p>' +
+                        '<p><strong>Startdatum:</strong> ' + datum_start + '</p>' +
+                        '<p><strong>Enddatum:</strong> ' + datum_ende + '</p>' +
+                        '<p><strong>Startzeit:</strong> ' + zeit_start + '</p>' +
+                        '<p><strong>Endzeit:</strong> ' + zeit_ende + '</p>' +
+                        '<p><strong>Bericht:</strong> ' + inhalt + '</p>' +
+                        '<p><strong>Notizen:</strong> ' + notiz + '</p>';
+
+                        // Fügen Sie das Element zur Sidebar hinzu
+                        document.getElementById('selectedDateInfo').appendChild(berichtElement);
+                    }
+                });
+              });
+
+                var sucheDatumButton = document.getElementById('sucheDatumButton');
+              sucheDatumButton.addEventListener('click', function() {
+                var sidebar = document.querySelector('.sidebar');
+                var datum_startInfo = document.getElementById('startDatum').value;
+
+                fetch('/sucheBerichtByDatum?datum_start=' + datum_startInfo)
+                .then(response => response.json())
+                .then(data => {
+                    // Leeren Sie die Sidebar
+                    document.getElementById('selectedDateInfo').innerHTML = '';
+
+                    // Durchlaufen Sie die Liste der Berichte
+                    for (var i = 0; i < data.length; i++) {
+                        var bericht = data[i];
+
+                        var id = bericht.id;
+                        var status = bericht.status;
+                        var datum_start = bericht.datum_start;
+                        var datum_ende = bericht.datum_ende;
+                        var zeit_start = bericht.zeit_start;
+                        var zeit_ende = bericht.zeit_ende;
+                        var inhalt = bericht.inhalt;
+                        var notiz = bericht.notiz;
+
+                        var dateStart = datum_start;
+                        var zeitStart = zeit_start;
+                        addEventListeners(dateStart, zeitStart);
+
+                        // Erstellen Sie ein neues Element für diesen Bericht
+                        var berichtElement = document.createElement('div');
+                        berichtElement.innerHTML =
+                        '<p><strong>ID:</strong> ' + id + '</p>' +
+                        '<p><strong>Status:</strong> ' + status + '</p>' +
+                        '<p><strong>Startdatum:</strong> ' + datum_start + '</p>' +
+                        '<p><strong>Enddatum:</strong> ' + datum_ende + '</p>' +
+                        '<p><strong>Startzeit:</strong> ' + zeit_start + '</p>' +
+                        '<p><strong>Endzeit:</strong> ' + zeit_ende + '</p>' +
+                        '<p><strong>Bericht:</strong> ' + inhalt + '</p>' +
+                        '<p><strong>Notizen:</strong> ' + notiz + '</p>';
+
+                        // Fügen Sie das Element zur Sidebar hinzu
+                        document.getElementById('selectedDateInfo').appendChild(berichtElement);
+                    }
+                });
+              });
+
+            function addEventListeners(dateStart, zeitStart) {
+                var overrideButton = document.getElementById('overrideButton');
+                if (overrideButton) {
+                    overrideButton.addEventListener('click', function() {
+                        window.location.href = '/bearbeiten/neu?datum_start=' + dateStart + '&zeit_start=' + zeitStart;
+                    });
+                }
+            }
+    });
+</script>
+<footer>
+
+</footer>
+</body>
+</html>
